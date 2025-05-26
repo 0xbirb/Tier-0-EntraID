@@ -26,6 +26,18 @@ variable "tenant_id" {
   sensitive   = true
 }
 
+variable "app_type" {
+  description = "Application type (from terraform.tfvars)"
+  type        = string
+  default     = ""
+}
+
+variable "permissions_description" {
+  description = "Permissions description (from terraform.tfvars)"
+  type        = string
+  default     = ""
+}
+
 variable "tier_definitions" {
   description = "Simplified tier definitions with roles and security requirements"
   type = map(object({
@@ -111,19 +123,19 @@ variable "tier_user_assignments" {
   
   default = {
     "tier-0" = {
-      "global-admin"           = ["admin1@devacp.onmicrosoft.com", "admin2@devacp.onmicrosoft.com"]
-      "privileged-auth-admin"  = ["authAdmin@devacp.onmicrosoft.com"]
-      "application-admin"      = ["appAdmin@devacp.onmicrosoft.com"]
-      "intune-admin"           = ["intuneAdmin@devacp.onmicrosoft.com"]
+      "global-admin"           = [] # Add your Global Admin users here
+      "privileged-auth-admin"  = [] # Add your Privileged Auth Admin users here
+      "application-admin"      = [] # Add your Application Admin users here
+      "intune-admin"           = [] # Add your Intune Admin users here
     }
     "tier-1" = {
-      "user-admin"     = ["userAdmin1@devacp.onmicrosoft.com", "userAdmin2@devacp.onmicrosoft.com"]
-      "security-admin" = ["secAdmin@devacp.onmicrosoft.com"]
-      "exchange-admin" = ["exchangeAdmin@devacp.onmicrosoft.com"]
+      "user-admin"     = [] # Add your User Admin users here
+      "security-admin" = [] # Add your Security Admin users here
+      "exchange-admin" = [] # Add your Exchange Admin users here
     }
     "tier-2" = {
-      "helpdesk-admin" = ["helpdesk1@devacp.onmicrosoft.com", "helpdesk2@devacp.onmicrosoft.com"]
-      "groups-admin"   = ["groupsAdmin@devacp.onmicrosoft.com"]
+      "helpdesk-admin" = [] # Add your Helpdesk Admin users here
+      "groups-admin"   = [] # Add your Groups Admin users here
     }
   }
 }

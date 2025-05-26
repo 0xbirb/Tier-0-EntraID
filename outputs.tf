@@ -50,20 +50,25 @@ output "tier_groups" {
 output "conditional_access_policies" {
   description = "Conditional Access policies created for tiering enforcement"
   value = {
-    tier0_paw = {
+    tier0_paw_block = {
       id           = azuread_conditional_access_policy.tier0_paw_enforcement.id
       display_name = azuread_conditional_access_policy.tier0_paw_enforcement.display_name
       state        = azuread_conditional_access_policy.tier0_paw_enforcement.state
     }
-    tier1_security = {
-      id           = azuread_conditional_access_policy.tier1_security.id
-      display_name = azuread_conditional_access_policy.tier1_security.display_name
-      state        = azuread_conditional_access_policy.tier1_security.state
+    tier0_paw_allow = {
+      id           = azuread_conditional_access_policy.tier0_paw_allow.id
+      display_name = azuread_conditional_access_policy.tier0_paw_allow.display_name
+      state        = azuread_conditional_access_policy.tier0_paw_allow.state
     }
-    tier2_mfa = {
-      id           = azuread_conditional_access_policy.tier2_mfa_required.id
-      display_name = azuread_conditional_access_policy.tier2_mfa_required.display_name
-      state        = azuread_conditional_access_policy.tier2_mfa_required.state
+    tier1_phishing_resistant = {
+      id           = azuread_conditional_access_policy.tier1_phishing_resistant.id
+      display_name = azuread_conditional_access_policy.tier1_phishing_resistant.display_name
+      state        = azuread_conditional_access_policy.tier1_phishing_resistant.state
+    }
+    tier2_phishing_resistant = {
+      id           = azuread_conditional_access_policy.tier2_phishing_resistant.id
+      display_name = azuread_conditional_access_policy.tier2_phishing_resistant.display_name
+      state        = azuread_conditional_access_policy.tier2_phishing_resistant.state
     }
     block_legacy = {
       id           = azuread_conditional_access_policy.block_legacy_auth.id
@@ -123,6 +128,10 @@ output "deployment_summary" {
     tiers_created         = length(var.tier_definitions)
     total_groups          = length(azuread_group.tier_role_groups)
     total_users_assigned  = length(data.azuread_user.tier_users)
-    ca_policies           = 5
+    ca_policies           = 6
     administrative_units  = length(azuread_administrative_unit.tier_units)
-    trusted_locations     = length(var.truste
+    trusted_locations     = length(var.trusted_locations)d_locations)
+    break_glass_accounts  = length(azuread_user.break_glass_accounts)
+    monitored_permissions = length(var.tier0_graph_permissions)
+  }
+}

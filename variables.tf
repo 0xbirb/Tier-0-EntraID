@@ -4,6 +4,28 @@ variable "organization_name" {
   default     = "devacp"
 }
 
+# Optional: Service Principal authentication variables
+variable "client_id" {
+  description = "Azure AD Application (client) ID for service principal authentication"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "client_secret" {
+  description = "Azure AD Application client secret for service principal authentication"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "tenant_id" {
+  description = "Azure AD Tenant ID"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
 variable "tier_definitions" {
   description = "Simplified tier definitions with roles and security requirements"
   type = map(object({
@@ -89,17 +111,19 @@ variable "tier_user_assignments" {
   
   default = {
     "tier-0" = {
-      "global-admin"           = ["admin1@contoso.com", "admin2@contoso.com"]
-      "privileged-auth-admin"  = ["authAdmin@contoso.com"]
-      "application-admin"      = ["appAdmin@contoso.com"]
+      "global-admin"           = ["admin1@devacp.onmicrosoft.com", "admin2@devacp.onmicrosoft.com"]
+      "privileged-auth-admin"  = ["authAdmin@devacp.onmicrosoft.com"]
+      "application-admin"      = ["appAdmin@devacp.onmicrosoft.com"]
+      "intune-admin"           = ["intuneAdmin@devacp.onmicrosoft.com"]
     }
     "tier-1" = {
-      "user-admin"     = ["userAdmin1@contoso.com", "userAdmin2@contoso.com"]
-      "security-admin" = ["secAdmin@contoso.com"]
+      "user-admin"     = ["userAdmin1@devacp.onmicrosoft.com", "userAdmin2@devacp.onmicrosoft.com"]
+      "security-admin" = ["secAdmin@devacp.onmicrosoft.com"]
+      "exchange-admin" = ["exchangeAdmin@devacp.onmicrosoft.com"]
     }
     "tier-2" = {
-      "helpdesk-admin" = ["helpdesk1@contoso.com", "helpdesk2@contoso.com"]
-      "groups-admin"   = ["groupsAdmin@contoso.com"]
+      "helpdesk-admin" = ["helpdesk1@devacp.onmicrosoft.com", "helpdesk2@devacp.onmicrosoft.com"]
+      "groups-admin"   = ["groupsAdmin@devacp.onmicrosoft.com"]
     }
   }
 }

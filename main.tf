@@ -9,7 +9,9 @@ terraform {
   required_version = ">= 1.0"
 }
 
-# Configure the Azure Active Directory Provider
+# Configure the Azure Active Directory Provider using Service Principal
 provider "azuread" {
-  # Configuration will be provided via environment variables or Azure CLI
+  client_id     = var.client_id
+  client_secret = var.client_secret  
+  tenant_id     = var.tenant_id
 }

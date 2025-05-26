@@ -218,6 +218,8 @@ resource "azuread_conditional_access_policy" "break_glass_secure_emergency" {
   state        = "disabled"  # Enable this if you want more restrictive break-glass
   
   conditions {
+    client_app_types = ["all"]
+    
     users {
       included_users = [for user in azuread_user.break_glass_accounts : user.object_id]
     }
@@ -233,9 +235,8 @@ resource "azuread_conditional_access_policy" "break_glass_secure_emergency" {
   }
   
   grant_controls {
-    operator                    = "AND"
-    built_in_controls          = []
-    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
+    operator          = "AND"
+    built_in_controls = ["mfa", "compliantDevice"]
   }
   
   session_controls {

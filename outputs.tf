@@ -130,7 +130,7 @@ output "deployment_summary" {
     total_users_assigned  = length(data.azuread_user.tier_users)
     ca_policies           = 6
     administrative_units  = length(azuread_administrative_unit.tier_units)
-    trusted_locations     = length(var.trusted_locations)d_locations)
+    trusted_locations     = length(var.trusted_locations)
     break_glass_accounts  = length(azuread_user.break_glass_accounts)
     monitored_permissions = length(var.tier0_graph_permissions)
   }

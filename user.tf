@@ -11,17 +11,19 @@ data "azuread_user" "tier_users" {
 
 # Assign users to groups (this is what was missing in the original!)
 resource "azuread_group_member" "tier_user_assignments" {
-  for_each = merge([
-    for tier_name, tier_assignments in var.tier_user_assignments : {
-      for role_key, users in tier_assignments : [
-        for user in users :
-        "${tier_name}-${role_key}-${user}" => {
-          group_object_id = azuread_group.tier_role_groups["${tier_name}-${role_key}"].object_id
-          user_object_id  = data.azuread_user.tier_users[user].object_id
-        }
+  for_each = {
+    for assignment in flatten([
+      for tier_name, tier_assignments in var.tier_user_assignments : [
+        for role_key, users in tier_assignments : [
+          for user in users : {
+            key             = "${tier_name}-${role_key}-${user}"
+            group_object_id = azuread_group.tier_role_groups["${tier_name}-${role_key}"].object_id
+            user_object_id  = data.azuread_user.tier_users[user].object_id
+          }
+        ]
       ]
-    }
-  ]...)
+    ]) : assignment.key => assignment
+  }
   
   group_object_id  = each.value.group_object_id
   member_object_id = each.value.user_object_id

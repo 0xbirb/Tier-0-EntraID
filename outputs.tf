@@ -75,25 +75,25 @@ output "conditional_access_policies" {
       display_name = azuread_conditional_access_policy.block_legacy_auth.display_name
       state        = azuread_conditional_access_policy.block_legacy_auth.state
     }
-    break_glass = {
-      id           = azuread_conditional_access_policy.break_glass_emergency_access.id
-      display_name = azuread_conditional_access_policy.break_glass_emergency_access.display_name
-      state        = azuread_conditional_access_policy.break_glass_emergency_access.state
-    }
+    break_glass = var.break_glass_config.create_accounts ? {
+      id           = azuread_conditional_access_policy.break_glass_emergency_access[0].id
+      display_name = azuread_conditional_access_policy.break_glass_emergency_access[0].display_name
+      state        = azuread_conditional_access_policy.break_glass_emergency_access[0].state
+    } : null
   }
 }
 
 # Break-glass accounts (sensitive)
 output "break_glass_accounts" {
   description = "Break-glass emergency access accounts"
-  value = {
+  value = var.break_glass_config.create_accounts ? {
     for idx, account in azuread_user.break_glass_accounts : idx => {
       id                  = account.id
       object_id          = account.object_id
       user_principal_name = account.user_principal_name
       display_name       = account.display_name
     }
-  }
+  } : {}
   sensitive = true
 }
 
@@ -131,7 +131,7 @@ output "deployment_summary" {
     ca_policies           = 6
     administrative_units  = length(azuread_administrative_unit.tier_units)
     trusted_locations     = length(var.trusted_locations)
-    break_glass_accounts  = length(azuread_user.break_glass_accounts)
+    break_glass_accounts  = var.break_glass_config.create_accounts ? length(azuread_user.break_glass_accounts) : 0
     monitored_permissions = length(var.tier0_graph_permissions)
   }
 }

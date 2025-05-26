@@ -1,6 +1,12 @@
-# Get the built-in phishing-resistant authentication strength policy
-data "azuread_authentication_strength_policy" "phishing_resistant" {
-  display_name = "Phishing-resistant MFA"
+# Create a custom phishing-resistant authentication strength policy
+resource "azuread_authentication_strength_policy" "phishing_resistant" {
+  display_name         = "${var.organization_name}-Phishing-Resistant-MFA"
+  description          = "Custom phishing-resistant authentication methods for tiered access"
+  allowed_combinations = [
+    "fido2",
+    "x509CertificateMultiFactor",
+    "windowsHelloForBusiness"
+  ]
 }
 
 # Conditional Access Policy for Tier-0 (STRICT: PAW + Phishing Resistant Auth REQUIRED)
@@ -73,7 +79,7 @@ resource "azuread_conditional_access_policy" "tier0_paw_allow" {
   grant_controls {
     operator                    = "AND"
     built_in_controls          = ["compliantDevice"]
-    authentication_strength_id = data.azuread_authentication_strength_policy.phishing_resistant.id
+    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
   }
   
   session_controls {
@@ -109,7 +115,7 @@ resource "azuread_conditional_access_policy" "tier1_phishing_resistant" {
   grant_controls {
     operator                    = "AND"
     built_in_controls          = ["compliantDevice"]
-    authentication_strength_id = data.azuread_authentication_strength_policy.phishing_resistant.id
+    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
   }
   
   session_controls {
@@ -144,7 +150,7 @@ resource "azuread_conditional_access_policy" "tier2_phishing_resistant" {
   grant_controls {
     operator                    = "AND"
     built_in_controls          = ["compliantDevice"]
-    authentication_strength_id = data.azuread_authentication_strength_policy.phishing_resistant.id
+    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
   }
   
   session_controls {
@@ -176,8 +182,10 @@ resource "azuread_conditional_access_policy" "block_legacy_auth" {
   }
 }
 
-# Break-glass emergency access policy (Special handling)
+# Break-glass emergency access policy (TRUE emergency access)
 resource "azuread_conditional_access_policy" "break_glass_emergency_access" {
+  count = var.break_glass_config.create_accounts ? 1 : 0
+  
   display_name = "${var.organization_name}-Break-Glass-Emergency-Access"
   state        = "enabled"
   
@@ -190,15 +198,14 @@ resource "azuread_conditional_access_policy" "break_glass_emergency_access" {
       included_applications = ["All"]
     }
     
-    locations {
-      included_locations = [for loc in azuread_named_location.trusted_locations : loc.id]
-    }
+    # NO location restrictions - emergency can happen anywhere
+    # NO device restrictions - emergency might be from any device
   }
   
   grant_controls {
-    operator                    = "AND"
-    built_in_controls          = []  # No device compliance for emergency
-    authentication_strength_id = data.azuread_authentication_strength_policy.phishing_resistant.id
+    operator          = "AND"
+    built_in_controls = ["mfa"]  # Regular MFA only - not phishing-resistant
+    # No device compliance requirement for true emergency access
   }
   
   session_controls {
@@ -206,5 +213,38 @@ resource "azuread_conditional_access_policy" "break_glass_emergency_access" {
     sign_in_frequency_period = "hours"
     persistent_browser_mode  = "never"
     cloud_app_security_type  = "blockDownloads"  # Extra security for break-glass
+  }
+}
+
+# Alternative: More secure break-glass with conditional location bypass
+resource "azuread_conditional_access_policy" "break_glass_secure_emergency" {
+  display_name = "${var.organization_name}-Break-Glass-Secure-Emergency"
+  state        = "disabled"  # Enable this if you want more restrictive break-glass
+  
+  conditions {
+    users {
+      included_users = [for user in azuread_user.break_glass_accounts : user.object_id]
+    }
+    
+    applications {
+      included_applications = ["All"]
+    }
+    
+    # Apply stricter controls when accessing from trusted locations
+    locations {
+      included_locations = [for loc in azuread_named_location.trusted_locations : loc.id]
+    }
+  }
+  
+  grant_controls {
+    operator                    = "AND"
+    built_in_controls          = []
+    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
+  }
+  
+  session_controls {
+    sign_in_frequency        = 1
+    sign_in_frequency_period = "hours"
+    persistent_browser_mode  = "never"
   }
 }

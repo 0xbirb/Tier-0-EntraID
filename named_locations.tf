@@ -4,7 +4,7 @@ resource "azuread_named_location" "trusted_locations" {
   
   display_name = each.value.name
   ip {
-    ip_ranges_ipv4 = each.value.ip_ranges
-    trusted        = each.value.is_trusted
+    ip_ranges = each.value.ip_ranges
+    trusted   = each.value.is_trusted
   }
 }

@@ -50,26 +50,16 @@ output "tier_groups" {
 output "conditional_access_policies" {
   description = "Conditional Access policies created for tiering enforcement"
   value = {
-    tier0_block_non_paw = {
-      id           = azuread_conditional_access_policy.tier0_block_non_paw.id
-      display_name = azuread_conditional_access_policy.tier0_block_non_paw.display_name
-      state        = azuread_conditional_access_policy.tier0_block_non_paw.state
-    }
-    tier0_paw_strong_auth = {
-      id           = azuread_conditional_access_policy.tier0_paw_strong_auth.id
-      display_name = azuread_conditional_access_policy.tier0_paw_strong_auth.display_name
-      state        = azuread_conditional_access_policy.tier0_paw_strong_auth.state
-    }
-    tier1_strong_auth = {
-      id           = azuread_conditional_access_policy.tier1_strong_auth.id
-      display_name = azuread_conditional_access_policy.tier1_strong_auth.display_name
-      state        = azuread_conditional_access_policy.tier1_strong_auth.state
-    }
-    tier2_strong_auth = {
-      id           = azuread_conditional_access_policy.tier2_strong_auth.id
-      display_name = azuread_conditional_access_policy.tier2_strong_auth.display_name
-      state        = azuread_conditional_access_policy.tier2_strong_auth.state
-    }
+    # Note: Update these resource names to match your actual conditional_access.tf file
+    # You might have: tier0_paw_enforcement, tier0_paw_allow, tier1_phishing_resistant, tier2_phishing_resistant
+    
+    # Commenting out until we confirm the actual resource names in your conditional_access.tf
+    # tier0_block_non_paw = {
+    #   id           = azuread_conditional_access_policy.tier0_block_non_paw.id
+    #   display_name = azuread_conditional_access_policy.tier0_block_non_paw.display_name
+    #   state        = azuread_conditional_access_policy.tier0_block_non_paw.state
+    # }
+    
     break_glass = var.break_glass_config.create_accounts ? {
       id           = azuread_conditional_access_policy.break_glass_emergency_access[0].id
       display_name = azuread_conditional_access_policy.break_glass_emergency_access[0].display_name

@@ -115,7 +115,7 @@ output "named_locations" {
     for name, location in azuread_named_location.trusted_locations : name => {
       id           = location.id
       display_name = location.display_name
-      ip_ranges    = location.ip[0].ip_ranges_ipv4
+      ip_ranges    = location.ip[0].ip_ranges
       trusted      = location.ip[0].trusted
     }
   }
@@ -127,7 +127,7 @@ output "deployment_summary" {
   value = {
     tiers_created         = length(var.tier_definitions)
     total_groups          = length(azuread_group.tier_role_groups)
-    total_users_assigned  = length(data.azuread_user.tier_users)
+    total_users_assigned  = local.has_users ? length(data.azuread_user.tier_users) : 0
     ca_policies           = 6
     administrative_units  = length(azuread_administrative_unit.tier_units)
     trusted_locations     = length(var.trusted_locations)

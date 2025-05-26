@@ -1,17 +1,25 @@
-# Get user objects for assignment
-data "azuread_user" "tier_users" {
-  for_each = toset(flatten([
+# Local to flatten all users from tier assignments
+locals {
+  all_assigned_users = flatten([
     for tier_name, tier_assignments in var.tier_user_assignments : [
       for role_key, users in tier_assignments : users
     ]
-  ]))
+  ])
+  
+  # Only create user assignments if there are users to assign
+  has_users = length(local.all_assigned_users) > 0
+}
+
+# Get user objects for assignment (only if users exist)
+data "azuread_user" "tier_users" {
+  for_each = local.has_users ? toset(local.all_assigned_users) : toset([])
   
   user_principal_name = each.value
 }
 
-# Assign users to groups (this is what was missing in the original!)
+# Assign users to groups (only if users exist)
 resource "azuread_group_member" "tier_user_assignments" {
-  for_each = {
+  for_each = local.has_users ? {
     for assignment in flatten([
       for tier_name, tier_assignments in var.tier_user_assignments : [
         for role_key, users in tier_assignments : [
@@ -23,7 +31,7 @@ resource "azuread_group_member" "tier_user_assignments" {
         ]
       ]
     ]) : assignment.key => assignment
-  }
+  } : {}
   
   group_object_id  = each.value.group_object_id
   member_object_id = each.value.user_object_id

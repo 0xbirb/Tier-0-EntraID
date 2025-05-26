@@ -4,7 +4,6 @@ variable "organization_name" {
   default     = "contoso"
 }
 
-# Simplified tier configuration - easier to understand
 variable "tier_definitions" {
   description = "Simplified tier definitions with roles and security requirements"
   type = map(object({
@@ -84,7 +83,6 @@ variable "tier_definitions" {
   }
 }
 
-# Simple user assignment variable - easy to understand and modify
 variable "tier_user_assignments" {
   description = "Users to assign to each tier and role - modify this to assign users"
   type = map(map(list(string)))
@@ -128,11 +126,13 @@ variable "break_glass_config" {
   default = {
     create_accounts           = true
     account_count            = 2
-    enable_by_default        = false  # Accounts disabled by default
-    require_phishing_resistant = false  # Use regular MFA for true emergency access
-    allow_from_any_location  = true   # Emergency can happen anywhere
+    enable_by_default        = false
+    require_phishing_resistant = false
+    allow_from_any_location  = true
   }
 }
+
+variable "trusted_locations" {
   description = "Named locations (IP ranges) considered trusted for administrative access"
   type = list(object({
     name         = string

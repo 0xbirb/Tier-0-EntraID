@@ -6,7 +6,7 @@ resource "azuread_administrative_unit" "tier_units" {
   description  = "${each.value.description} Administrative Unit"
   
   # Make Administrative Units RESTRICTED
-  visibility = "HiddenMembership"
+  hidden_membership_enabled = true
   
   prevent_duplicate_names = true
 }
@@ -27,7 +27,7 @@ resource "azuread_administrative_unit" "aad_connect_au" {
   description  = "Administrative Unit for AAD Connect sync accounts - requires special monitoring"
   
   # Make Administrative Unit RESTRICTED
-  visibility = "HiddenMembership"
+  hidden_membership_enabled = true
   
   prevent_duplicate_names = true
 }

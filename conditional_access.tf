@@ -1,13 +1,5 @@
-# Create a custom phishing-resistant authentication strength policy
-resource "azuread_authentication_strength_policy" "phishing_resistant" {
-  display_name         = "${var.organization_name}-Phishing-Resistant-MFA"
-  description          = "Custom phishing-resistant authentication methods for tiered access"
-  allowed_combinations = [
-    "fido2",
-    "x509CertificateMultiFactor",
-    "windowsHelloForBusiness"
-  ]
-}
+# Note: Authentication Strength Policies require Azure AD Premium P1/P2
+# For now, using standard MFA instead of custom phishing-resistant policy
 
 # Conditional Access Policy for Tier-0 (STRICT: PAW + Phishing Resistant Auth REQUIRED)
 resource "azuread_conditional_access_policy" "tier0_paw_enforcement" {
@@ -15,6 +7,8 @@ resource "azuread_conditional_access_policy" "tier0_paw_enforcement" {
   state        = "enabled"
   
   conditions {
+    client_app_types = ["all"]
+    
     users {
       included_groups = [
         for key, group in azuread_group.tier_role_groups : group.object_id
@@ -52,6 +46,8 @@ resource "azuread_conditional_access_policy" "tier0_paw_allow" {
   state        = "enabled"
   
   conditions {
+    client_app_types = ["all"]
+    
     users {
       included_groups = [
         for key, group in azuread_group.tier_role_groups : group.object_id
@@ -77,16 +73,14 @@ resource "azuread_conditional_access_policy" "tier0_paw_allow" {
   }
   
   grant_controls {
-    operator                    = "AND"
-    built_in_controls          = ["compliantDevice"]
-    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
+    operator          = "AND"
+    built_in_controls = ["mfa", "compliantDevice"]
   }
   
   session_controls {
     sign_in_frequency        = var.tier_definitions["tier-0"].session_timeout_hours
     sign_in_frequency_period = "hours"
     persistent_browser_mode  = "never"
-    cloud_app_security_type  = "monitorOnly"
   }
 }
 
@@ -96,6 +90,8 @@ resource "azuread_conditional_access_policy" "tier1_phishing_resistant" {
   state        = "enabled"
   
   conditions {
+    client_app_types = ["all"]
+    
     users {
       included_groups = [
         for key, group in azuread_group.tier_role_groups : group.object_id
@@ -113,15 +109,13 @@ resource "azuread_conditional_access_policy" "tier1_phishing_resistant" {
   }
   
   grant_controls {
-    operator                    = "AND"
-    built_in_controls          = ["compliantDevice"]
-    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
+    operator          = "AND"
+    built_in_controls = ["mfa", "compliantDevice"]
   }
   
   session_controls {
     sign_in_frequency        = var.tier_definitions["tier-1"].session_timeout_hours
     sign_in_frequency_period = "hours"
-    cloud_app_security_type  = "monitorOnly"
   }
 }
 
@@ -131,6 +125,8 @@ resource "azuread_conditional_access_policy" "tier2_phishing_resistant" {
   state        = "enabled"
   
   conditions {
+    client_app_types = ["all"]
+    
     users {
       included_groups = [
         for key, group in azuread_group.tier_role_groups : group.object_id
@@ -148,9 +144,8 @@ resource "azuread_conditional_access_policy" "tier2_phishing_resistant" {
   }
   
   grant_controls {
-    operator                    = "AND"
-    built_in_controls          = ["compliantDevice"]
-    authentication_strength_id = azuread_authentication_strength_policy.phishing_resistant.id
+    operator          = "AND"
+    built_in_controls = ["mfa", "compliantDevice"]
   }
   
   session_controls {
@@ -190,6 +185,8 @@ resource "azuread_conditional_access_policy" "break_glass_emergency_access" {
   state        = "enabled"
   
   conditions {
+    client_app_types = ["all"]
+    
     users {
       included_users = [for user in azuread_user.break_glass_accounts : user.object_id]
     }
@@ -212,7 +209,6 @@ resource "azuread_conditional_access_policy" "break_glass_emergency_access" {
     sign_in_frequency        = 1
     sign_in_frequency_period = "hours"
     persistent_browser_mode  = "never"
-    cloud_app_security_type  = "blockDownloads"  # Extra security for break-glass
   }
 }
 

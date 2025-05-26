@@ -40,7 +40,4 @@ resource "azuread_user" "break_glass_accounts" {
   
   # Use variable to control if accounts are enabled by default
   account_enabled = var.break_glass_config.enable_by_default
-  
-  # Force password change on first sign-in
-  force_change_password_next_sign_in = true
 }

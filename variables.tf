@@ -1,7 +1,7 @@
 variable "organization_name" {
   description = "Name of the organization for resource naming"
   type        = string
-  default     = "contoso"
+  default     = "devacp"
 }
 
 variable "tier_definitions" {

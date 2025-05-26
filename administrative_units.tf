@@ -16,7 +16,8 @@ resource "azuread_administrative_unit_member" "tier_group_members" {
   for_each = azuread_group.tier_role_groups
   
   administrative_unit_object_id = azuread_administrative_unit.tier_units[
-    split("-", each.key)[0] # Extract tier name from "tier-0-role-name"
+    # Extract tier name correctly: "tier-0-global-admin" -> "tier-0"
+    join("-", slice(split("-", each.key), 0, 2))
   ].object_id
   member_object_id = each.value.object_id
 }

@@ -50,30 +50,25 @@ output "tier_groups" {
 output "conditional_access_policies" {
   description = "Conditional Access policies created for tiering enforcement"
   value = {
-    tier0_paw_block = {
-      id           = azuread_conditional_access_policy.tier0_paw_enforcement.id
-      display_name = azuread_conditional_access_policy.tier0_paw_enforcement.display_name
-      state        = azuread_conditional_access_policy.tier0_paw_enforcement.state
+    tier0_block_non_paw = {
+      id           = azuread_conditional_access_policy.tier0_block_non_paw.id
+      display_name = azuread_conditional_access_policy.tier0_block_non_paw.display_name
+      state        = azuread_conditional_access_policy.tier0_block_non_paw.state
     }
-    tier0_paw_allow = {
-      id           = azuread_conditional_access_policy.tier0_paw_allow.id
-      display_name = azuread_conditional_access_policy.tier0_paw_allow.display_name
-      state        = azuread_conditional_access_policy.tier0_paw_allow.state
+    tier0_paw_strong_auth = {
+      id           = azuread_conditional_access_policy.tier0_paw_strong_auth.id
+      display_name = azuread_conditional_access_policy.tier0_paw_strong_auth.display_name
+      state        = azuread_conditional_access_policy.tier0_paw_strong_auth.state
     }
-    tier1_phishing_resistant = {
-      id           = azuread_conditional_access_policy.tier1_phishing_resistant.id
-      display_name = azuread_conditional_access_policy.tier1_phishing_resistant.display_name
-      state        = azuread_conditional_access_policy.tier1_phishing_resistant.state
+    tier1_strong_auth = {
+      id           = azuread_conditional_access_policy.tier1_strong_auth.id
+      display_name = azuread_conditional_access_policy.tier1_strong_auth.display_name
+      state        = azuread_conditional_access_policy.tier1_strong_auth.state
     }
-    tier2_phishing_resistant = {
-      id           = azuread_conditional_access_policy.tier2_phishing_resistant.id
-      display_name = azuread_conditional_access_policy.tier2_phishing_resistant.display_name
-      state        = azuread_conditional_access_policy.tier2_phishing_resistant.state
-    }
-    block_legacy = {
-      id           = azuread_conditional_access_policy.block_legacy_auth.id
-      display_name = azuread_conditional_access_policy.block_legacy_auth.display_name
-      state        = azuread_conditional_access_policy.block_legacy_auth.state
+    tier2_strong_auth = {
+      id           = azuread_conditional_access_policy.tier2_strong_auth.id
+      display_name = azuread_conditional_access_policy.tier2_strong_auth.display_name
+      state        = azuread_conditional_access_policy.tier2_strong_auth.state
     }
     break_glass = var.break_glass_config.create_accounts ? {
       id           = azuread_conditional_access_policy.break_glass_emergency_access[0].id
@@ -128,7 +123,7 @@ output "deployment_summary" {
     tiers_created         = length(var.tier_definitions)
     total_groups          = length(azuread_group.tier_role_groups)
     total_users_assigned  = local.has_users ? length(data.azuread_user.tier_users) : 0
-    ca_policies           = 6
+    ca_policies           = 4
     administrative_units  = length(azuread_administrative_unit.tier_units)
     trusted_locations     = length(var.trusted_locations)
     break_glass_accounts  = var.break_glass_config.create_accounts ? length(azuread_user.break_glass_accounts) : 0

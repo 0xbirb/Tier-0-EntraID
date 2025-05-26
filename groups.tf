@@ -18,8 +18,7 @@ resource "azuread_group" "tier_role_groups" {
   assignable_to_role     = true
   prevent_duplicate_names = true
   
-  # Add to appropriate Administrative Unit
-  administrative_unit_ids = [azuread_administrative_unit.tier_units[each.value.tier_name].object_id]
+  # Groups will be added to Administrative Units via explicit membership
 }
 
 # Create monitoring groups for security purposes

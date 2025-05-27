@@ -1,12 +1,5 @@
 # Enhanced variables.tf - Add these to your existing variables.tf file
 
-# ===== NEW VARIABLES FOR LIFECYCLE MANAGEMENT =====
-
-variable "enable_lifecycle_management" {
-  description = "Enable automated lifecycle management for cloud admin accounts"
-  type        = bool
-  default     = false
-}
 
 variable "cloud_admin_naming_convention" {
   description = "Naming convention for cloud administrator accounts"
@@ -32,18 +25,6 @@ variable "enable_management_restricted_au" {
   default     = true
 }
 
-variable "azure_location" {
-  description = "Azure region for automation account resources"
-  type        = string
-  default     = "eastus2"
-}
-
-variable "resource_group_name" {
-  description = "Resource group for Azure Automation resources"
-  type        = string
-  default     = ""
-}
-
 variable "enable_pim_configuration" {
   description = "Enable Privileged Identity Management configuration for cloud admins"
   type        = bool
@@ -66,41 +47,10 @@ variable "cloud_admin_authentication_strength" {
   }
 }
 
-variable "automation_account_config" {
-  description = "Configuration for Azure Automation Account"
-  type = object({
-    sku_name                    = string
-    enable_diagnostic_settings  = bool
-    log_analytics_workspace_id  = string
-  })
-  default = {
-    sku_name                   = "Basic"
-    enable_diagnostic_settings = false
-    log_analytics_workspace_id = ""
-  }
-}
 
-variable "cloud_admin_license_config" {
-  description = "License configuration for cloud administrator accounts"
-  type = object({
-    assign_licenses = bool
-    license_skus = list(object({
-      sku_id = string
-      disabled_plans = list(string)
-    }))
-  })
-  default = {
-    assign_licenses = true
-    license_skus = [
-      {
-        sku_id = "EXCHANGEDESKLESS" # Exchange Online Kiosk
-        disabled_plans = []
-      }
-    ]
-  }
-}
 
-# ===== ENHANCED TIER DEFINITIONS =====
+
+#  ENHANCED TIER DEFINITIONS 
 
 variable "enhanced_tier_definitions" {
   description = "Enhanced tier definitions with cloud admin support"
@@ -157,6 +107,13 @@ variable "enhanced_tier_definitions" {
         "intune-admin" = {
           role_id     = "3a2c62db-5318-420d-8d74-23affee5d9d5"
           description = "Intune Administrator"
+          is_permanent = false
+          max_duration_hours = 8
+        }
+        }
+        "user-admin" = {
+          role_id     = "3a2c62db-5318-420d-8d74-23affee5d9d5"
+          description = "User Administrator"
           is_permanent = false
           max_duration_hours = 8
         }
@@ -219,39 +176,7 @@ variable "enhanced_tier_definitions" {
   }
 }
 
-# ===== MONITORING AND COMPLIANCE =====
 
-variable "monitoring_config" {
-  description = "Configuration for monitoring cloud administrator activities"
-  type = object({
-    enable_monitoring = bool
-    alert_email_addresses = list(string)
-    log_retention_days = number
-    enable_sentinel_integration = bool
-  })
-  default = {
-    enable_monitoring = true
-    alert_email_addresses = []
-    log_retention_days = 90
-    enable_sentinel_integration = false
-  }
-}
-
-variable "compliance_config" {
-  description = "Compliance configuration for cloud administrators"
-  type = object({
-    require_attestation = bool
-    attestation_frequency_days = number
-    max_inactive_days = number
-    require_training = bool
-  })
-  default = {
-    require_attestation = true
-    attestation_frequency_days = 90
-    max_inactive_days = 30
-    require_training = true
-  }
-}
 
 # ===== EXISTING VARIABLES (keeping backwards compatibility) =====
 
@@ -294,110 +219,6 @@ variable "permissions_description" {
   default     = ""
 }
 
-# Keep existing tier_definitions for backwards compatibility
-variable "tier_definitions" {
-  description = "Simplified tier definitions with roles and security requirements"
-  type = map(object({
-    description               = string
-    requires_paw             = bool
-    session_timeout_hours    = number
-    roles = map(object({
-      role_id     = string
-      description = string
-    }))
-  }))
-  
-  default = {
-    "tier-0" = {
-      description            = "Domain and Enterprise Administration"
-      requires_paw          = true
-      session_timeout_hours = 1
-      roles = {
-        "global-admin" = {
-          role_id     = "62e90394-69f5-4237-9190-012177145e10"
-          description = "Global Administrator"
-        }
-        "privileged-auth-admin" = {
-          role_id     = "7be44c8a-adaf-4e2a-84d6-ab2649e08a13"
-          description = "Privileged Authentication Administrator"
-        }
-        "privileged-role-admin" = {
-          role_id     = "e8611ab8-c189-46e8-94e1-60213ab1f814"
-          description = "Privileged Role Administrator"
-        }
-        "application-admin" = {
-          role_id     = "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
-          description = "Application Administrator"
-        }
-        "intune-admin" = {
-          role_id     = "3a2c62db-5318-420d-8d74-23affee5d9d5"
-          description = "Intune Administrator"
-        }
-      }
-    }
-    
-    "tier-1" = {
-      description            = "Identity and Resource Administration"
-      requires_paw          = true
-      session_timeout_hours = 4
-      roles = {
-        "user-admin" = {
-          role_id     = "fe930be7-5e62-47db-91af-98c3a49a38b1"
-          description = "User Administrator"
-        }
-        "exchange-admin" = {
-          role_id     = "29232cdf-9323-42fd-ade2-1d097af3e4de"
-          description = "Exchange Administrator"
-        }
-        "security-admin" = {
-          role_id     = "194ae4cb-b126-40b2-bd5b-6091b380977d"
-          description = "Security Administrator"
-        }
-      }
-    }
-    
-    "tier-2" = {
-      description            = "Workstation and Application Administration"
-      requires_paw          = false
-      session_timeout_hours = 8
-      roles = {
-        "helpdesk-admin" = {
-          role_id     = "729827e3-9c14-49f7-bb1b-9608f156bbb8"
-          description = "Helpdesk Administrator"
-        }
-        "groups-admin" = {
-          role_id     = "fdd7a751-b60b-444a-984c-02652fe8fa1c"
-          description = "Groups Administrator"
-        }
-      }
-    }
-  }
-}
-
-# Keep existing variables for backwards compatibility
-variable "tier_user_assignments" {
-  description = "Users to assign to each tier and role - modify this to assign users"
-  type = map(map(list(string)))
-  
-  default = {
-    "tier-0" = {
-      "global-admin"           = []
-      "privileged-auth-admin"  = []
-      "application-admin"      = []
-      "intune-admin"           = []
-    }
-    "tier-1" = {
-      "user-admin"     = []
-      "security-admin" = []
-      "exchange-admin" = []
-    }
-    "tier-2" = {
-      "helpdesk-admin" = []
-      "groups-admin"   = []
-    }
-  }
-}
-
 variable "paw_device_ids" {
   description = "List of Privileged Access Workstation device IDs allowed for tier 0 access"
   type        = list(string)
@@ -418,8 +239,8 @@ variable "break_glass_config" {
   })
   
   default = {
-    create_accounts           = true
-    account_count            = 2
+    create_accounts           = false
+    account_count            = 1
     enable_by_default        = false
     require_phishing_resistant = false
     allow_from_any_location  = true

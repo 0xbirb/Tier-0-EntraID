@@ -7,12 +7,8 @@ client_id     = "12345678-1234-1234-1234-123456789012"
 client_secret = "your-super-secret-client-secret-here"
 tenant_id     = "87654321-4321-4321-4321-210987654321"
 
-# ===== ORGANIZATION CONFIGURATION =====
 organization_name = "yourcompany"
 
-# ===== CLOUD ADMIN LIFECYCLE MANAGEMENT =====
-# Enable the new lifecycle management features
-enable_lifecycle_management = true
 
 # Cloud Administrator naming convention
 cloud_admin_naming_convention = {
@@ -26,22 +22,7 @@ primary_account_domain = "yourcompany.com"
 # Enable Management Restricted Administrative Units
 enable_management_restricted_au = true
 
-# ===== AZURE RESOURCES =====
-# Azure region for automation resources
-azure_location = "eastus2"
 
-# Resource group for Azure Automation
-resource_group_name = "rg-cloudadmin-automation-prod"
-
-# Subscription ID for Azure resources
-subscription_id = "f47626a6-2970-41a8-b44c-a4a14ccff181"
-
-# ===== AUTOMATION CONFIGURATION =====
-automation_account_config = {
-  sku_name                   = "Basic"
-  enable_diagnostic_settings = true
-  log_analytics_workspace_id = ""  # Will be created automatically
-}
 
 # ===== ENHANCED TIER DEFINITIONS =====
 # Use enhanced_tier_definitions for cloud admin support
